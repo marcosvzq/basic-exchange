@@ -2,7 +2,7 @@
 
 import requests
 
-menu = """
+menu_start = """
     -----------------------------------------------------------------
                  <<< Conversor de Moneda >>>
     -----------------------------------------------------------------
@@ -11,33 +11,48 @@ menu = """
     2.- Dolares (USD) a Pesos (MXN)
     3.- Cualquier tecla para salir 
 
-    Seleccione una opcion: """
+    Seleccione una opcion: 
+    """
 
-option = int(input('Seleccione una opcion: '))
-
-
-def conversor(amount:  float, exchange_rate: str):
-    amount = float(input('Ingresa la cantidad de' + exchange_rate +' : '))
-    count_divise = str(count_divise)
-
-if option == 1:
-    conversor(100, 'Pesos (MXN)')
-
-# url for get a conversion directly
-# url = "https://api.apilayer.com/exchangerates_data/convert?to=MXN&from=USD&amount=" + count_divise
-
-# url for get the value of divise
-url = "https://api.apilayer.com/exchangerates_data/latest?symbols=MXN&base=USD"
-
-url = "https://api.apilayer.com/exchangerates_data/latest?symbols=MXN&base=USD"
+option = int(input(menu_start))
 
 payload = {}
 headers= {
-  "apikey": "fMRuOGbmuqb3kHNKa17ycA3QgoHhNGrX"
+    "apikey": "fMRuOGbmuqb3kHNKa17ycA3QgoHhNGrX"
 }
 
-response = requests.request("GET", url, headers=headers, data = payload)
-json_data = response.json() if response and response.status_code == 200 else None
+def conversor(amount:  float):
+    if option == 1:
+        
+        url = "https://api.apilayer.com/exchangerates_data/latest?symbols=MXN&base=USD"        
+
+        response = requests.request("GET", url, headers=headers, data = payload)
+        json_data = response.json() if response and response.status_code == 200 else None
+
+        if json_data and 'rates' in json_data:
+            usd = json_data['rates'].get('MXN')
+
+        amount = round(float(amount) / usd, 2)
+        print(str(amount))
+        
+
+
+    if option == 2:
+
+        url = "https://api.apilayer.com/exchangerates_data/latest?symbols=USD&base=MXN"
+
+        response = requests.request("GET", url, headers=headers, data = payload)
+        json_data = response.json() if response and response.status_code == 200 else None
+
+        if json_data and 'rates' in json_data:
+            mxn = json_data['rates'].get('USD')
+
+        amount = round(float(amount) / mxn, 2)
+        print(str(amount))
+
+
+# url for get a conversion directly
+# url = "https://api.apilayer.com/exchangerates_data/convert?to=MXN&from=USD&amount=" + count_divise
 
 #status_code = response.status_code
 
@@ -45,24 +60,19 @@ json_data = response.json() if response and response.status_code == 200 else Non
     if 'rate' in json_data['info']:
         usd = json_data['info'].get('rate') """
 
-if json_data and 'rates' in json_data:
-    usd = json_data['rates'].get('MXN')
-
-#count_usd = round(float(count_divise) / usd, 2)
-
-footer = """
-
-    El valor del Dolar (USD) es de: ' + str(usd)
-    -----------------------------------------------------------
-"""
-
-#print(count_divise + ' MXN es equivalente a ' + str(count_usd) + ' USD')
-#print('')
-
-    
 
 def run():
-    print(menu)
+    print(menu_start)
+
+    if option == 1:
+        exchange_rate = 'Pesos (MXN)'
+        amount = float(input('  Ingresa la cantidad de ' + exchange_rate +' : '))
+        conversor(amount)
+
+    if option == 2:
+        exchange_rate = 'Dolares (USD)'
+        amount = float(input('  Ingresa la cantidad de ' + exchange_rate +' : '))
+        conversor(amount)
 
 
 if __name__ == "__main__":
